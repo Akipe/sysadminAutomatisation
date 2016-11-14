@@ -1,0 +1,10 @@
+---
+- name: Installation de Python2.7 sur Ubuntu 16.04 pour le fonctionnement de Ansible.
+  hosts: xenials
+  gather_facts: False
+  tasks:
+    - name: apt-get update
+      raw: apt-get update -qq
+    - name: Install Python 2.7
+      raw: apt-get install -qq python2.7
+...
