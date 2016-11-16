@@ -1,0 +1,33 @@
+---
+
+- name: Chargement des variables
+  hosts: all
+  tasks:
+    - name: Chargement
+      include_vars: file="protect.yml" name=protect
+    - name: test
+      include_vars: file="_docker.yml" name=docker
+
+
+- name: Création de l'application Gogs pour la gestion du code sous Git
+  hosts: selfhost
+  remote_user:  "{{ protect.USER_NAME }}"
+  become: yes
+  tasks:
+    - name: Génération de la config pour le proxy docker
+    
+    - name: Génération du container
+      docker_container:
+        name: app_git
+        image: gogs/gogs
+        ports:
+          - 22222:22
+        expose:
+          - 3000
+        volumes:
+          - /docker/app_git/data:/data
+        networks:
+          - name: "{{ docker.PROXY_NETWORK }}"
+    - name: Envois de 
+        
+...
