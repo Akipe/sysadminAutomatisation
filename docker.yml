@@ -22,5 +22,12 @@
       apt: name=docker-engine state=latest
     - name: Démarage et activation au démarrage de Docker
       service: name=docker state=started enabled=yes
+    - name: Création du dossier pour le stockage des données des containers
+      file: path=/docker state=directory
+    - name: Installation de python
+      apt: name=python-pip
+    - name: Installation du module pip docker-pip
+      pip: name=python-pip
+      
 
 ...
