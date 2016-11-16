@@ -1,0 +1,32 @@
+---
+
+- name: Chargement des variables
+  hosts: all
+  tasks:
+    - name: Chargement
+      include_vars: file="protect.yml" name=protect
+    - name: test
+      include_vars: file="_docker.yml" name=docker
+
+
+- name: Création du container Nginx pour le proxy des applications
+  hosts: selfhost
+  remote_user:  "{{ protect.USER_NAME }}"
+  become: yes
+  tasks:
+    - name: Création du network proxy
+      docker_network: name={{ docker.PROXY_NETWORK }}
+
+    - name: Génération du container
+      docker_container:
+        name: proxy
+        image: nginx
+        ports:
+          - 80:80
+          - 443:443
+        volumes:
+          - /docker/proxy/conf.d:/etc/nginx/conf.d/
+        networks:
+          - name: "{{ docker.PROXY_NETWORK }}"
+        
+...
