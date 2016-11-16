@@ -1,18 +1,33 @@
 ---
+
+- name: Chargement des variables
+  hosts: all
+  tasks:
+    - name: Chargement
+      include_vars: file="protect.yml" name=protect
+
+
 - name: Mise en place d'une configuration initial pour serveur.
   hosts: selfhost
-  vars:
-    user: akp
-
+  remote_user: "{{ protect.USER_NAME }}"
+  become: yes
   tasks:
-    - name: Installation des applications.
+    - name: Mise à jour du cache Apt
+      apt: update_cache=yes cache_valid_time=3600
+
+    - name: Mise à jour du système
+      apt: upgrade=dist
+
+    - name: Suppression des applications inutiles
+      command: apt-get -y autoremove
+      register: autoremove_output
+      changed_when: "'The following packages will be REMOVED' in autoremove_output.stdout"
+
+    - name: Installation des applications de base.
       apt: name={{ item }} update_cache=yes state=latest
       with_items:
         - vim
         - git
-        - zsh
         - htop
-    - name: Création d'un nouveau utilisateur
-      user: name={{ user }} createhome=yes shell=/bin/zsh groups=admin
       
 ...
