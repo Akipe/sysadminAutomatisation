@@ -1,0 +1,26 @@
+---
+
+- name: Chargement des variables
+  hosts: all
+  tasks:
+    - name: Chargement
+      include_vars: file="protect.yml" name=protect
+
+
+- name: Mise en place de Docker
+  hosts: selfhost
+  remote_user: "{{ protect.USER_NAME }}"
+  become: yes
+  tasks:
+    - name: Ajout de la clée GPG
+      apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
+    - name: Ajout du repository
+      apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-xenial main' state=present filename='docker'
+    - name: Mise à jour du cache Apt 
+      apt: update_cache=yes force=yes
+    - name: Installation de Docker
+      apt: name=docker-engine state=latest
+    - name: Démarage et activation au démarrage de Docker
+      service: name=docker state=started enabled=yes
+
+...
