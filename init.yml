@@ -38,7 +38,7 @@
       user: name=root password="{{ protect.ROOT_PASSWORD }}"
 
     - name: Redémarage du service ssh
-      systemd: name=ssh state=restarted
+      service: name=ssh state=restarted
 
 
 
