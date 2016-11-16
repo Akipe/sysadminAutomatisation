@@ -1,0 +1,5 @@
+---
+# Use mkpasswd --method=sha-512 to generate password
+USER_NAME: user
+USER_PASSWORD: user_password_generate
+ROOT_PASSWORD: root_password_generate

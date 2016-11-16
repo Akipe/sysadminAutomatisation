@@ -1,10 +1,45 @@
 ---
 - name: Installation de Python2.7 sur Ubuntu 16.04 pour le fonctionnement de Ansible.
   hosts: xenials
+  remote_user: root
+  become: yes
   gather_facts: False
   tasks:
     - name: apt-get update
       raw: apt-get update -qq
+
     - name: Install Python 2.7
       raw: apt-get install -qq python2.7
+
+
+- name: Création d'un utilisateur administrateur
+  hosts: init
+  remote_user: root
+  become: yes
+  tasks:
+    - name: Chargement des variables
+      include_vars:
+        file: protect.yml
+        name: protect
+
+    - name: Installation de zsh
+      apt: name=zsh update_cache=yes state=latest
+
+    - name: Création de l'utilisateur
+      user: name={{ protect.USER_NAME }} password={{ protect.USER_PASSWORD }} createhome=yes shell=/bin/zsh groups=admin
+
+    - name: Ajout de l'utilisateur à ssh
+      lineinfile: dest=/etc/ssh/sshd_config insertafter=EOF line="AllowUsers {{ protect.USER_NAME }}"
+
+    - name: Supression de root à ssh
+      lineinfile: dest=/etc/ssh/sshd_config regexp="^#?PermitRootLogin" line="PermitRootLogin no"
+
+    - name: changement du mot de passe de l'utilisateur root
+      user: name=root password="{{ protect.ROOT_PASSWORD }}"
+
+    - name: Redémarage du service ssh
+      systemd: name=ssh state=restarted
+
+
+
 ...
